@@ -87,6 +87,9 @@ const USE_LZ: bool = {
     } else if cfg!(any(target_arch = "riscv32", target_arch = "riscv64")) {
         // The `B` extension on RISC-V determines if a CLZ assembly instruction exists
         cfg!(target_feature = "b")
+    } else if cfg!(any(target_arch = "cramp32", target_arch = "cramp64")) {
+        // The `B` extension on RISC-V determines if a CLZ assembly instruction exists
+        cfg!(target_feature = "b")
     } else {
         // All other common targets Rust supports should have CLZ instructions
         true

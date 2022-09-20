@@ -136,7 +136,7 @@ intrinsics! {
     ))]
     /// Returns the number of leading binary zeros in `x`.
     pub extern "C" fn __clzsi2(x: usize) -> usize {
-        if cfg!(any(target_arch = "riscv32", target_arch = "riscv64")) {
+        if cfg!(any(target_arch = "riscv32", target_arch = "riscv64", target_arch = "cramp32", target_arch = "cramp64")) {
             usize_leading_zeros_riscv(x)
         } else {
             usize_leading_zeros_default(x)
