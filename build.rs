@@ -62,7 +62,7 @@ fn main() {
         //   compiler.
         if !target.contains("wasm")
             && !target.contains("nvptx")
-            && (!target.starts_with("riscv") || target.contains("xous"))
+            && ((!target.starts_with("riscv") && !target.starts_with("cramp")) || target.contains("xous"))
         {
             #[cfg(feature = "c")]
             c::compile(&llvm_target, &target);
