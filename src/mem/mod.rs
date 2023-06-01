@@ -47,23 +47,21 @@ intrinsics! {
     #[cfg_attr(not(all(target_os = "windows", target_env = "gnu")), linkage = "weak")]
     #[inline(always)]
     pub unsafe extern "C" fn memset(s: *mut u8, c: crate::mem::c_int, n: usize) -> *mut u8 {
-        //impls::set_bytes(s, c as u8, n);
+        impls::set_bytes(s, c as u8, n);
+        s
+    }
+
+    #[mem_builtin]
+    #[cfg_attr(not(all(target_os = "windows", target_env = "gnu")), linkage = "weak")]
+    #[inline(always)]
+    pub unsafe extern "C" fn __aligned_bzero4(s: *mut u8, n: usize) -> *mut u8 {
         let mut t: *mut u32 = s as *mut u32;
-        let d = c as u32;
-        let x = (((core::mem::transmute::<*mut u32, usize>(t) as u32) | (n as u32)) & 3) | d;
-        impls::testz(x);
-        //if x != 0 {
-            // impls::set_bytes(s, c as u8, n);
-            // return t as *mut u8;
-            // loop {}
-	//} else {
-            let end = s.add(n) as *mut u32;
-            loop {
-                *t = 0;
-                t = t.add(1);
-                if t >= end { break; }
-            }
-        //}
+        let end = s.add(n) as *mut u32;
+        loop {
+            *t = 0;
+            t = t.add(1);
+            if t == end { break; }
+        }
         t as *mut u8
     }
 
