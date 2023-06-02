@@ -55,14 +55,7 @@ intrinsics! {
     #[cfg_attr(not(all(target_os = "windows", target_env = "gnu")), linkage = "weak")]
     #[inline(always)]
     pub unsafe extern "C" fn __aligned_bzero4(s: *mut u8, n: usize) -> *mut u8 {
-        let mut t: *mut u32 = s as *mut u32;
-        let end = s.add(n) as *mut u32;
-        loop {
-            *t = 0;
-            t = t.add(1);
-            if t == end { break; }
-        }
-        t as *mut u8
+        impls::alined_bzero4_impl(s, n)
     }
 
     #[mem_builtin]

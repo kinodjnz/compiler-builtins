@@ -1,4 +1,5 @@
 use core::intrinsics::likely;
+use core::arch::asm;
 
 const WORD_SIZE: usize = core::mem::size_of::<usize>();
 const WORD_MASK: usize = WORD_SIZE - 1;
@@ -220,6 +221,34 @@ pub unsafe fn copy_backward(dest: *mut u8, src: *const u8, mut n: usize) {
         n -= n_words;
     }
     copy_backward_bytes(dest, src, n);
+}
+
+#[cfg(not(target_arch = "cramp32"))]
+#[inline(always)]
+pub unsafe fn alined_bzero4_impl(s: *mut u8, n: usize) -> *mut u8 {
+    let mut t: *mut u32 = s as *mut u32;
+    let end = s.add(n) as *mut u32;
+    loop {
+        *t = 0;
+        t = t.add(1);
+        if t == end { break; }
+    }
+    t as *mut u8
+}
+
+#[cfg(target_arch = "cramp32")]
+#[inline(always)]
+pub unsafe fn alined_bzero4_impl(mut p: *mut u8, s: usize) -> *mut u8 {
+    asm!(
+        "add  {s}, {p}, {s}",
+        "1:",
+        "sw   zero, ({p})",
+        "addi {p}, {p}, 4",
+        "bne  {p}, {s}, 1b",
+        p = in(reg) p,
+        s = in(reg) s,
+    );
+    p
 }
 
 #[inline(always)]
